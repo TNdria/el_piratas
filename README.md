@@ -79,7 +79,7 @@ Les anciennes clés API ont été supprimées du dépôt grâce à :
 ## 📁 Structure du projet
 
     el_pirata/
-    │── backend/               # Backend Laravel
-    │── el_pirata_api/         # Frontend (React ou autre)
+    │── backend/               # Frontend 
+    │── el_pirata_api/         # Backend Laravel
     │── docker-compose.yml
     └── README.md
