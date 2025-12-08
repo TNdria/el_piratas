@@ -32,39 +32,31 @@
 
 
 
-# ---- Base PHP ----
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
-# Installer les dépendances système
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip \
-    libzip-dev \
-    sqlite3 libsqlite3-dev \
+    git curl zip unzip sqlite3 libsqlite3-dev libzip-dev \
     && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
 
-# Installer Composer
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Définir dossier de travail
 WORKDIR /var/www
 
-# Copier tout le code du projet
+# Copy project files
 COPY . .
 
-# Installer dépendances PHP (avant de copier tout le code → cache optimisé)
+# Install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Permissions pour Laravel
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Set permissions
+RUN chmod -R 777 storage bootstrap/cache
 
-# Variables d'environnement recommandées pour Railway/Render
-ENV APP_ENV=production \
-    APP_DEBUG=false \
-    LOG_CHANNEL=stderr
+# Railway provides the PORT env var
+ENV PORT=8080
 
-# Port exposé
-EXPOSE 8000
+EXPOSE 8080
 
-# Commande de lancement
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD php -S 0.0.0.0:$PORT -t public
