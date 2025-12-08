@@ -34,29 +34,23 @@
 
 FROM php:8.2-cli
 
-# Install system dependencies
+WORKDIR /var/www
+
+COPY . .
+
 RUN apt-get update && apt-get install -y \
     git curl zip unzip sqlite3 libsqlite3-dev libzip-dev \
     && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
 
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
-
-# Copy project files
-COPY . .
-
-# Install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Set permissions
+# Donner permissions Laravel
 RUN chmod -R 777 storage bootstrap/cache
 
-# Railway provides the PORT env var
-ENV PORT=8080
+EXPOSE 8000
 
-EXPOSE 8080
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
-CMD php -S 0.0.0.0:$PORT -t public
