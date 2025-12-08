@@ -49,14 +49,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Définir dossier de travail
 WORKDIR /var/www
 
-# Copier uniquement les fichiers nécessaires
-COPY composer.json composer.lock ./
+# Copier tout le code du projet
+COPY . .
 
 # Installer dépendances PHP (avant de copier tout le code → cache optimisé)
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Copier tout le code du projet
-COPY . .
 
 # Permissions pour Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache
