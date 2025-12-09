@@ -22,12 +22,6 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 # Give permissions
 RUN chmod -R 777 storage bootstrap/cache
 
-# =======================================================
-# LIGNE CLÉ : EXÉCUTER LES MIGRATIONS DE LA BASE DE DONNÉES
-# Ceci est exécuté APRÈS l'installation du driver.
-# =======================================================
-RUN php artisan migrate --force
-
 EXPOSE 8000
 
 # Démarrer l'application
