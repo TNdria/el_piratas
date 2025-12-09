@@ -16,8 +16,8 @@ class AdminSeeder extends Seeder
     {
         Admin::create([
             'name' => 'Admin',
-            'email' => 'tndria.ingenium@gmail.com',
-            'password' => Hash::make('password123'), // 🔐 change le mot de passe
+            'email' => 'tndria@gmail.com',
+            'password' => Hash::make('123456'), // 🔐 change le mot de passe
             'role_id' => 1
         ]);
     }

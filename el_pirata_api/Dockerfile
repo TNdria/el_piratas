@@ -1,30 +1,30 @@
 FROM php:8.2-fpm
 
-# Installer les dépendances système
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip \
-    libzip-dev \
-    sqlite3 libsqlite3-dev \
-    && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
+    git curl zip unzip libpq-dev libzip-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql zip
 
-# Installer Composer
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Définir dossier de travail
+# Create working directory
 WORKDIR /var/www
 
-# Copier les fichiers du projet
+# Copy app files
 COPY . .
 
-# Installer dépendances PHP
+# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Donner les permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Laravel permissions
+RUN chmod -R 777 storage bootstrap/cache
 
-# Exposer le port utilisé par Laravel
-EXPOSE 8000
+# Expose port
+EXPOSE 8080
 
-# Lancer Laravel en mode serveur interne
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Render expects the app to listen on $PORT (variable auto)
+ENV PORT=8080
+
+# Launch Laravel
+CMD php artisan serve --host 0.0.0.0 --port $PORT
