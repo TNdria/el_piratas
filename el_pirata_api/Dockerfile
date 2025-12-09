@@ -2,29 +2,23 @@ FROM php:8.2-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpq-dev libzip-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip
+    git curl zip unzip libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Create working directory
 WORKDIR /var/www
 
 # Copy app files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# Install dependencies
+RUN composer install --no-interaction --no-scripts --no-dev --optimize-autoloader
 
-# Laravel permissions
-RUN chmod -R 777 storage bootstrap/cache
+# Cache
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
 
-# Expose port
-EXPOSE 8080
+EXPOSE 8000
 
-# Render expects the app to listen on $PORT (variable auto)
-ENV PORT=8080
-
-# Launch Laravel
-CMD php artisan serve --host 0.0.0.0 --port $PORT
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
