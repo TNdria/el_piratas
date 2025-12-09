@@ -1,23 +1,23 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
-# Install system dependencies
+WORKDIR /var/www
+
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+    git curl zip unzip libpq-dev libzip-dev \
+    && docker-php-ext-install pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
-
-# Copy app files
+# Copy application files
 COPY . .
 
-# Install dependencies
-RUN composer install --no-interaction --no-scripts --no-dev --optimize-autoloader
+# Install dependencies Laravel
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Cache
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
+# Give permissions
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 
