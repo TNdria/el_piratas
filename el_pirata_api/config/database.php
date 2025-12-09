@@ -84,12 +84,20 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            
+            // 1. UTILISER DATABASE_URL (STANDARD)
+            'url' => $databaseUrl = env('DATABASE_URL'), 
+
+            // 2. PARSER AVEC VÉRIFICATION PHP 8.2 POUR ÉVITER 'null'
+            // Les valeurs env() servent de fallback si l'URL n'est pas définie, 
+            // les valeurs statiques sont des fallbacks ultimes.
+            'host' => env('DB_HOST', ($databaseUrl ? parse_url($databaseUrl, PHP_URL_HOST) : '127.0.0.1')),
+            'port' => env('DB_PORT', ($databaseUrl ? parse_url($databaseUrl, PHP_URL_PORT) : '5432')),
+            'database' => env('DB_DATABASE', ($databaseUrl ? ltrim(parse_url($databaseUrl, PHP_URL_PATH), '/') : 'laravel')),
+            'username' => env('DB_USERNAME', ($databaseUrl ? parse_url($databaseUrl, PHP_URL_USER) : 'root')),
+            'password' => env('DB_PASSWORD', ($databaseUrl ? parse_url($databaseUrl, PHP_URL_PASS) : null)),
+            
+            // Reste de la configuration
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
