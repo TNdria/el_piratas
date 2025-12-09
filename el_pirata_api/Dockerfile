@@ -2,13 +2,16 @@ FROM php:8.2-cli
 
 WORKDIR /var/www
 
-# Install dependencies
+# Install system dependencies, including PostgreSQL library headers
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpq-dev libzip-dev \
-    && docker-php-ext-install pdo pdo_pgsql zip
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Install PHP extensions, including pdo_pgsql
+RUN docker-php-ext-install pdo pdo_pgsql zip
 
 # Copy application files
 COPY . .
@@ -21,7 +24,7 @@ RUN chmod -R 777 storage bootstrap/cache
 
 # =======================================================
 # LIGNE CLÉ : EXÉCUTER LES MIGRATIONS DE LA BASE DE DONNÉES
-# Ceci résout l'erreur "relation "sessions" does not exist".
+# Ceci est exécuté APRÈS l'installation du driver.
 # =======================================================
 RUN php artisan migrate --force
 
