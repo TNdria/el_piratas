@@ -26,4 +26,4 @@ EXPOSE 8000
 
 # Démarrer l'application
 # Démarrer l'application (modifié pour utiliser le shell)
-CMD ["/bin/sh", "-c", "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
+CMD [ "/bin/sh", "-c", "php artisan migrate --force && php artisan tinker --execute \"\\App\\Models\\Admin::firstOrCreate(['email' => 'tndria@gmail.com'], ['name' => 'Admin', 'password' => \\Hash::make('123456')])\" && php artisan serve --host=0.0.0.0 --port=8000" ]
