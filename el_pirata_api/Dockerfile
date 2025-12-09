@@ -20,13 +20,11 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 RUN chmod -R 777 storage bootstrap/cache
 
 # =======================================================
-# NOUVELLE ÉTAPE : EXÉCUTER LES MIGRATIONS
-# Nous utilisons 'php artisan migrate --force' pour garantir 
-# que la DB est prête avant de démarrer le serveur.
+# ÉTAPE CLÉ : Exécuter les migrations de base de données.
+# Ceci crée la table "sessions" manquante.
 # =======================================================
 RUN php artisan migrate --force
 
 EXPOSE 8000
 
-# Démarrer l'application
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
