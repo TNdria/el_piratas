@@ -85,16 +85,18 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST'),
-            'port' => env('DB_PORT'),
-            'database' => env('DB_DATABASE'),
-            'username' => env('DB_USERNAME'),
-            'password' => env('DB_PASSWORD'),
+            'host' => env('DB_HOST', parse_url(env('DATABASE_URL'), PHP_URL_HOST)),
+            'port' => env('DB_PORT', parse_url(env('DATABASE_URL'), PHP_URL_PORT)),
+            'database' => env('DB_DATABASE', ltrim(parse_url(env('DATABASE_URL'), PHP_URL_PATH), '/')),
+            'username' => env('DB_USERNAME', parse_url(env('DATABASE_URL'), PHP_URL_USER)),
+            'password' => env('DB_PASSWORD', parse_url(env('DATABASE_URL'), PHP_URL_PASS)),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'sslmode' => 'require',   // Render nécessite SSL
+            'schema' => 'public',
+            'sslmode' => 'prefer',
         ],
+
 
 
         'sqlsrv' => [
