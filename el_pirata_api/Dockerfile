@@ -20,11 +20,12 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 RUN chmod -R 777 storage bootstrap/cache
 
 # =======================================================
-# ÉTAPE CLÉ : Exécuter les migrations de base de données.
-# Ceci crée la table "sessions" manquante.
+# LIGNE CLÉ : EXÉCUTER LES MIGRATIONS DE LA BASE DE DONNÉES
+# Ceci résout l'erreur "relation "sessions" does not exist".
 # =======================================================
 RUN php artisan migrate --force
 
 EXPOSE 8000
 
+# Démarrer l'application
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
